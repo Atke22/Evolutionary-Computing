@@ -5,14 +5,14 @@ from random import randrange
 
 def paring_regular(mother, father):
 	child = mother
-	mix_len = child.size / 2
+	mix_len = int(child.size / 2)
 	child[mix_len:] = father[mix_len:]
 	return child
 
 def paring_random(mother,father):
 	child = mother
 	child_len = child.size
-	mix_len = child_len / 2
+	mix_len = int(child_len / 2)
 	is_changed = np.zeros(child.size)
 	change_count = 0
 	while change_count < mix_len:
@@ -25,9 +25,9 @@ def paring_random(mother,father):
 
 def crossover1(mother, father):
 	cross_point = randrange(1,mother.size-1) # could also be exactly at middle
-	print mother, father
+	# print mother, father
 	child1 = np.concatenate((mother[:cross_point],father[cross_point:]))
-	print mother, father
+	# print mother, father
 	child2 = np.concatenate((father[:cross_point],mother[cross_point:]))
 	return child1, child2
 
@@ -44,20 +44,20 @@ def crossover_uniform(mother, father):
 
 
 
-mother = np.empty(10)
+mother = np.empty(11)
 mother.fill(2)
 
 #print mother
 
-father = np.empty(10)
+father = np.empty(11)
 father.fill(3)
 
 #print father
 
-#print paring_regular(mother, father)
-#print paring_random(mother, father)
-#print crossover1(mother, father)
-print crossover_uniform(mother, father)
+print(paring_regular(mother, father))
+print(paring_random(mother, father))
+print(crossover1(mother, father))
+print(crossover_uniform(mother, father))
 
 
 # dit is gemaakt voor 1 kind per ouders, veel "standaard" crossover algoritmes maken 2 kinderen per ouders.

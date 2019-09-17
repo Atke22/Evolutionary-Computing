@@ -19,27 +19,39 @@ if not os.path.exists(experiment_name):
 # n_hidden = env.player_controller.n_hidden[0]
 # n_vars = (env.get_num_sensors()+1)*n_hidden + (n_hidden+1)*5 # multilayer with 10 hidden neurons
 
-n = np.zeros(n_vars) + 0.5
+# n = np.zeros(n_vars) + 0.5
 
 def fitness(kid):
 	f, pl, el, gt = env.play(pcont=kid)
 	return f
 
-fitness(n)
+# fitness(n)
 
-# def mutation_N_weigths_max_mutate(kid, weigths_c, max_mutate):
-# 	count =0
-# 	weigths_c = int(weigths_c)
-# 	## can't loop using for...in, as choice returns new list
-# 	for i in np.random.choice(len(kid), weigths_c,replace=False):
-# 		count+=1
-# 		kid[i] += np.random.uniform(-max_mutate, max_mutate)
-# 		if kid[i] > 1:
-# 			kid[i] = 1
+def norm_fitness(fitness_list):
+	maxi = np.amax(fitness_list)
+	mini = np.amin(fitness_list)
+	fitness_list -= mini
+	return fitness_list/np.sum(fitness_list)
 
-# 		elif kid[i] < -1:
-# 			kid[i] = -1
-# 	return kid
+
+a = np.arange(5)
+
+b = a - 2
+# print(a,b)
+print(norm_fitness(a), norm_fitness(b))
+def mutation_N_weigths_max_mutate(kid, weigths_c, max_mutate):
+	count =0
+	weigths_c = int(weigths_c)
+	## can't loop using for...in, as choice returns new list
+	for i in np.random.choice(kid.size, weigths_c,replace=False):
+		count+=1
+		kid[i] += np.random.uniform(-max_mutate, max_mutate)
+		if kid[i] > 1:
+			kid[i] = 1
+
+		elif kid[i] < -1:
+			kid[i] = -1
+	return kid
 
 
 
