@@ -28,23 +28,15 @@ def fitness(kid):
 # fitness(n)
 
 def norm_fitness(fitness_list):
-	maxi = np.amax(fitness_list)
 	mini = np.amin(fitness_list)
 	fitness_list -= mini
 	return fitness_list/np.sum(fitness_list)
 
 
-a = np.arange(5)
-
-b = a - 2
-# print(a,b)
-print(norm_fitness(a), norm_fitness(b))
 def mutation_N_weigths_max_mutate(kid, weigths_c, max_mutate):
-	count =0
 	weigths_c = int(weigths_c)
 	## can't loop using for...in, as choice returns new list
 	for i in np.random.choice(kid.size, weigths_c,replace=False):
-		count+=1
 		kid[i] += np.random.uniform(-max_mutate, max_mutate)
 		if kid[i] > 1:
 			kid[i] = 1
@@ -55,12 +47,7 @@ def mutation_N_weigths_max_mutate(kid, weigths_c, max_mutate):
 
 
 
-# def save_data(kid_fitness_list, save_file):
-# 	with open(save_file, 'a') as csvfile:
-# 		new_line = ','.join(str(kid_fitness) for kid_fitness in kid_fitness_list)
-# 		csvfile.write(new_line + '\n')
-
-
-# a = list(range(5))
-
-# save_data(a,'henk.txt')
+def save_data(kid_fitness_list, save_file):
+	with open(save_file, 'a') as csvfile:
+		new_line = ','.join(str(kid_fitness) for kid_fitness in kid_fitness_list)
+		csvfile.write(new_line + '\n')
