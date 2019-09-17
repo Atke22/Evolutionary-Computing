@@ -6,11 +6,11 @@ Created on Mon Sep 16 19:08:38 2019
 """
 import numpy as np
 
-def speeddate (list, fit, numDood):
+def speeddate (lijstje, fit, numDood):
     numDood = numDood
-    NumPossibleParents=len(list)-numDood
+    NumPossibleParents=len(lijstje)-numDood
     
-    np.sort(list) #order list
+    np.sort(lijstje) #order list
     for j in range (0, numDood,1):
         p1 = np.random.randint(0,NumPossibleParents)
         fitp1 = fit[p1]
