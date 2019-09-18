@@ -20,7 +20,8 @@ env = Environment(experiment_name=experiment_name,
 
 def fitness(kid):
 	f, pl, el, gt = env.play(pcont=kid)
-
+	if f < 0.000001:
+		f = 0.000001
 	return  f
 
 def make_fit_list(data):
@@ -70,30 +71,54 @@ def mutation_N_weigths_max_mutate(kid, weigths_c, max_mutate):
 
 
 def crossover_uniform(mother, father):
+	
+	# every gene is iterated over
 	child_size = mother.size
 	for i in range(child_size):
-		cross_choice = rand.randrange(2)
-		if cross_choice == 1:
+		
+		# a random number between 0 and 1 is chosen
+		cross_choice = np.random.uniform(0,1)
+		
+		# when this number is greater than .5 the gene of the mother and father are switched
+		if cross_choice > .5:
 			mother_plh = mother[i]
 			mother[i] = father[i]
 			father[i] = mother_plh
+	
+
 	father_kiddo = mutation_N_weigths_max_mutate(father, Jorien, Inge)
 	mother_kiddo = mutation_N_weigths_max_mutate(mother, Jorien, Inge)
 
 	return mother_kiddo, father_kiddo
 
-
+def roulette_wheel_survivor_selection(population, n_survivors):
+    survivors = []
+    #fit_survivors = []
+    
+    for survivor in range(n_survivors):
+        sum_fitness = np.sum(make_fit_list(population))
+        random_number = np.random.uniform(0, 1)
+        c = 0
+        
+        for individual in population:
+            c = c + individual['fitness']/sum_fitness
+            if c >= random_number:
+                survivors.append(individual)
+                population.remove(individual)
+                break
+    
+    return survivors
 
 pop_size = 10
-gen_size = 3
+gen_number = 3
 min_weight = -1
 max_weight = 1
 
 n_hidden = env.player_controller.n_hidden[0]
 n_vars = (env.get_num_sensors()+1)*n_hidden + (n_hidden+1)*5 # multilayer with 10 hidden neurons
 
-
-
+offspring_num = int(pop_size/4)
+num_potential_partners = 4
 ## haha 
 Jorien = 0.1 * n_vars
 Inge = 0.1
@@ -111,16 +136,16 @@ for kid in start_pop:
 			'fitness' : fit
 		})
 
-# weights = make_kids_list(data)
-# fitness_list = make_fit_list(data)
+for i in range(gen_number):
+	
+	# create new offspring 
+	data = speeddate(data, offspring_num, num_potential_partners)
+	
+	# select which inididuals will go the next generation
+	data = roulette_wheel_survivor_selection(data, pop_size)
+	
+	best_individual = sorted(data, key=lambda x: x['fitness'])[-1]
+	print(best_individual['fitness'])
 
-# data = [ {'weights' : np.array([i]), 'fitness': i} for i in range(10)]
-
-a =speeddate(data, 2 , 3)
-
-a = [(i['fitness']) for i in a]
-print(a)
 
 
-# print(make_fit_list(data))
-# print(sum_fit_list(data))
