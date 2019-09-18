@@ -110,6 +110,12 @@ def roulette_wheel_survivor_selection(population, n_survivors):
     
     return survivors
 
+def save_data(kid_list, save_file):
+	with open(save_file, 'a') as csvfile:
+		new_line = ','.join(str(kid['fitness']) for kid in kid_list)
+		csvfile.write(new_line + '\n')
+
+
 pop_size = 20
 gen_number = 10
 min_weight = -1
