@@ -22,8 +22,6 @@ def roulette_wheel_survivor_selection(population, n_survivors):
                 survivors.append(copy.copy(individual))
                 individual['fitness'] = 0
                 break
-    print(survivors)
-    print(population)
     return survivors
 
 

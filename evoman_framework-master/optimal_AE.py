@@ -4,6 +4,7 @@ from environment import Environment
 from demo_controller import player_controller
 import numpy as np
 import random as rand
+import copy
 
 experiment_name = 'dummy_demo'
 if not os.path.exists(experiment_name):
@@ -103,14 +104,14 @@ def roulette_wheel_survivor_selection(population, n_survivors):
         for individual in population:
             c = c + individual['fitness']/sum_fitness
             if c >= random_number:
-                survivors.append(individual)
-                population.remove(individual)
+                survivors.append(copy.copy(individual))
+                individual['fitness'] = 0
                 break
     
     return survivors
 
-pop_size = 10
-gen_number = 3
+pop_size = 20
+gen_number = 10
 min_weight = -1
 max_weight = 1
 
