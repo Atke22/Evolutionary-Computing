@@ -103,11 +103,15 @@ def roulette_wheel_survivor_selection(population, n_survivors):
     
     for survivor in range(n_survivors):
         sum_fitness = np.sum(make_fit_list(population))
-        random_number = np.random.uniform(0, 1)
+        random_number = rand.random()
         c = 0
         
         for individual in population:
             c = c + individual['fitness']/sum_fitness
+            print(individual['fitness'])
+            print(sum_fitness)
+            print(c)
+            print(random_number)
             if c >= random_number:
                 survivors.append(copy.copy(individual))
                 individual['fitness'] = 0
@@ -122,7 +126,7 @@ def save_data(kid_list, save_file):
 
 
 pop_size = 20
-gen_number = 10
+gen_number = 50
 min_weight = -1
 max_weight = 1
 
@@ -133,7 +137,7 @@ offspring_num = int(pop_size/4)
 num_potential_partners = 4
 ## haha 
 Jorien = 0.1 * n_vars
-Inge = 0.1
+Inge = 0.5
 
 
 
@@ -161,6 +165,7 @@ for i in range(gen_number):
 	
 	best_individual = sorted(data, key=lambda x: x['fitness'])[-1]
 	print(best_individual['fitness'])
+	save_data(data, 'results/gen4_50gen.csv')
 
 
 
