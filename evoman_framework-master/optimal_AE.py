@@ -23,13 +23,10 @@ def fitness(kid):
 	f, pl, el, gt = env.play(pcont=kid)
 	if f < 0.000001:
 		f = 0.000001
-	return  f
+	return  f, pl, el, gt
 
-def make_fit_list(data):
-	return [i['fitness'] for i in data]
-
-def make_kids_list(data):
-	return [i['weights'] for i in data]
+def make_list(data,key):
+	return [i[key] for i in data]
 
 def sum_fit_list(data):
 	return sum(make_fit_list(data))
@@ -46,12 +43,20 @@ def speeddate (pop, numParing, numK): #input is pop&fitness array, aantal koppel
 		perfect_partner = sorted(desperate_people, key=lambda x: x['fitness'])[-1]
 		# print(perfect_partner)
 		kiddo1, kiddo2 = crossover_uniform(perfect_partner['weights'], parent['weights'])
+		fit, pl, el, gt = fitness(kiddo1)
+		fit2, pl2, el2, gt2 = fitness(kiddo2)
 		pop.extend([{
 				'weights' : kiddo1,
-				'fitness' : fitness(kiddo1)
+				'fitness' : fit,
+				'player_life' : pl,
+				'enemy_life' : el,
+				'game_time' : gt
 				}, {
 				'weights' : kiddo2,
-				'fitness' : fitness(kiddo2)
+				'fitness' : fit,
+				'player_life' : pl2,
+				'enemy_life' : el2,
+				'game_time' : gt2
 				}
 			])
 
@@ -137,10 +142,13 @@ start_pop = np.random.uniform(min_weight, max_weight, (pop_size, n_vars))
 data = []
 
 for kid in start_pop:
-	fit = fitness(kid)
+	fit, pl, el, gt = fitness(kid)
 	data.append({
 			'weights' : kid,
-			'fitness' : fit
+			'fitness' : fit,
+			'player_life' : pl,
+			'enemy_life' : el,
+			'game_time' : gt
 		})
 
 for i in range(gen_number):
