@@ -5,18 +5,60 @@ from demo_controller import player_controller
 import numpy as np
 import random as rand
 import copy
+import json
 
 experiment_name = 'dummy_demo'
 if not os.path.exists(experiment_name):
 	os.makedirs(experiment_name)
 
 
+
+##########################################################
+# variables
+
+
+
+level = 2
+pop_size = 4
+gen_number = 4
+min_weight = -1
+max_weight = 1
+
 env = Environment(experiment_name=experiment_name,
 				  playermode="ai",
 				  player_controller=player_controller(),
 				  speed="fastest",
 				  enemymode="static",
-				  level=2)
+				  level=level)
+
+
+
+n_hidden = env.player_controller.n_hidden[0]
+n_vars = (env.get_num_sensors()+1)*n_hidden + (n_hidden+1)*5 # multilayer with 10 hidden neurons
+
+offspring_num = int(pop_size/4)
+num_potential_partners = 4
+## haha 
+Jorien = 0.1 * n_vars
+Inge = 0.5
+
+
+
+
+
+# end variables
+##########################################################
+
+
+
+def find_next_file():
+	i = 0 
+	file_name = 'results/level_' + str(level) + '_run_'
+	while os.path.exists(file_name + str(i) + '.csv'):
+		i+=1
+
+	file_name += str(i) + '.csv'
+	return file_name
 
 
 def fitness(kid):
@@ -28,8 +70,8 @@ def fitness(kid):
 def make_list(data,key):
 	return [i[key] for i in data]
 
-def sum_fit_list(data):
-	return sum(make_fit_list(data))
+def sum_list(data, key):
+	return sum(make_list(data,key))
 
 
 def speeddate (pop, numParing, numK): #input is pop&fitness array, aantal koppeltje, aantal parents waaruit je selecteert
@@ -102,16 +144,16 @@ def roulette_wheel_survivor_selection(population, n_survivors):
     #fit_survivors = []
     
     for survivor in range(n_survivors):
-        sum_fitness = np.sum(make_fit_list(population))
+        sum_fitness = sum_list(population, 'fitness')
         random_number = rand.random()
         c = 0
         
         for individual in population:
             c = c + individual['fitness']/sum_fitness
-            print(individual['fitness'])
-            print(sum_fitness)
-            print(c)
-            print(random_number)
+            # print(individual['fitness'])
+            # print(sum_fitness)
+            # print(c)
+            # print(random_number)
             if c >= random_number:
                 survivors.append(copy.copy(individual))
                 individual['fitness'] = 0
@@ -119,32 +161,28 @@ def roulette_wheel_survivor_selection(population, n_survivors):
     
     return survivors
 
-def save_data(kid_list, save_file):
-	with open(save_file, 'a') as csvfile:
-		new_line = ','.join(str(kid['fitness']) for kid in kid_list)
-		csvfile.write(new_line + '\n')
+def save_data(kid_list):
+	keys = list(kid_list[0].keys())
+	keys.remove('weights')
+	data = {}	
+
+	with open(file_name, 'a') as csvfile:
+		for key in keys:
+			data[key] = make_list(kid_list, key)
+			print(data[key])
+		csvfile.write(json.dumps(data) + '\n')
+		# new_line = ','.join(str(kid['fitness']) for kid in kid_list)
+		# csvfile.write(new_line + '\n')
 
 
-pop_size = 20
-gen_number = 50
-min_weight = -1
-max_weight = 1
 
-n_hidden = env.player_controller.n_hidden[0]
-n_vars = (env.get_num_sensors()+1)*n_hidden + (n_hidden+1)*5 # multilayer with 10 hidden neurons
-
-offspring_num = int(pop_size/4)
-num_potential_partners = 4
-## haha 
-Jorien = 0.1 * n_vars
-Inge = 0.5
 
 
 
 start_pop = np.random.uniform(min_weight, max_weight, (pop_size, n_vars))
 
 data = []
-
+file_name = find_next_file()
 for kid in start_pop:
 	fit, pl, el, gt = fitness(kid)
 	data.append({
@@ -164,8 +202,8 @@ for i in range(gen_number):
 	data = roulette_wheel_survivor_selection(data, pop_size)
 	
 	best_individual = sorted(data, key=lambda x: x['fitness'])[-1]
-	print(best_individual['fitness'])
-	save_data(data, 'results/gen4_50gen.csv')
+	# print(best_individual['fitness'])
+	save_data(data)
 
 
 
