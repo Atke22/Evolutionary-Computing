@@ -29,7 +29,8 @@ env = Environment(experiment_name=experiment_name,
 				  player_controller=player_controller(),
 				  speed="fastest",
 				  enemymode="static",
-				  level=level)
+				  level=2,
+				  enemies=[level])
 
 
 
