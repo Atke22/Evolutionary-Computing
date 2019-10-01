@@ -15,7 +15,7 @@ if not os.path.exists(experiment_name):
 ##########################################################
 # variables
 
-enemies=[1]
+level=1
 pop_size = 200
 gen_number = 200
 min_weight = -1
@@ -23,7 +23,7 @@ max_weight = 1
 
 env = Environment(experiment_name=experiment_name,
 				  playermode="ai",
-				  enemies=enemies,
+				  enemies=[level],
 				  player_controller=player_controller(),
 				  speed="fastest",
 				  enemymode="static",
