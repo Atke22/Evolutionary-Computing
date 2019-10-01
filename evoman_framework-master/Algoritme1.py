@@ -15,8 +15,8 @@ if not os.path.exists(experiment_name):
 ##########################################################
 # variables
 
-level=1
-pop_size = 200
+level=2
+pop_size = 5
 gen_number = 200
 min_weight = -1
 max_weight = 1
@@ -78,11 +78,13 @@ def speeddate (pop, numParing, numK): #input is pop&fitness array, aantal koppel
 
 	possible_parents = rand.sample(pop, k=numParing)
 	for parent in possible_parents:
-		perfect_partner = rand.sample(pop)
+		# perfect_partner = rand.sample(pop, k=1)
+		perfect_partner = rand.choice(pop)
 		
-		if parent == perfect_partner:
-			perfect_partner=rand.sample(pop)
-
+		# if parent == perfect_partner:
+		while np.array_equal(parent['weights'], perfect_partner['weights']):
+			perfect_partner = rand.choice(pop)
+		
 		kiddo1, kiddo2 = crossover_uniform(perfect_partner['weights'], parent['weights'])
 		fit, pl, el, gt = fitness(kiddo1)
 		fit2, pl2, el2, gt2 = fitness(kiddo2)
@@ -228,6 +230,7 @@ save_data(data)
 for i in range(gen_number):
 	
 	# create new offspring 
+	print(type(data))
 	data = speeddate(data, offspring_num, num_potential_partners)
 	
 	# select which inididuals will go the next generation
