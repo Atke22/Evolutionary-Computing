@@ -26,7 +26,7 @@ if not os.path.exists(experiment_name):
 
 # do you want to continue your old run?
 continue_run = False
-continue_file = ''
+continue_file = 'results/'
 
 
 # initialises the framework. enemy number can be changed accordingly
@@ -54,8 +54,8 @@ max_weight = 1
 
 
 # parameter settings of the algorithm
-pop_size = 10
-gen_number = 10
+pop_size = 100
+gen_number = 100
 runs = 10
 mutation_rate = 0.1
 parent_fraction = 0.5
@@ -113,7 +113,8 @@ def speeddate (pop, num_paring, num_selection):
 
 # makes two offspring from two parents
 def crossover_uniform(parent1, parent2):
-	
+	parent1 = copy.deepcopy(parent1)
+	parent2 = copy.deepcopy(parent2)
 	# iterates over every gene
 	child_size = parent1.size
 	for i in range(child_size):
@@ -135,7 +136,7 @@ def crossover_uniform(parent1, parent2):
 # gives mutation to agent
 def mutation(agent, mut_count, mut_value):
 	mut_count = int(mut_count)
-	
+	agent = copy.deepcopy(agent)
 	# selects mut_count weights of agent
 	for i in np.random.choice(agent.size, mut_count,replace=False):
 		
