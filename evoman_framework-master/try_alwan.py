@@ -7,75 +7,80 @@ import json
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import glob
+from scipy import stats
 
 algorithms = ['alg1', 'alg2']
 boxplot_data = []
+end_fitness = []
 for alg in algorithms:
 	for level in range(1,4):
 		runs = glob.glob('results/'+ str(alg) + '/*/level_' + str(level) + '*[0-9].csv')
-		if not runs:
-			runs = glob.glob('results/'+ str(alg) + '/*/Alg1_enemy' + str(level) + '*[0-9].csv')
-
-		fitness = []
+		
+		runs.extend(glob.glob('results/'+ str(alg) + '/*/Alg1_enemy' + str(level) + '*[0-9].csv'))
+		#fitness = []
 		max_fitness = []
+		fittie = []
 		for run in runs:
+			fitness = []
 			with open(run, 'r') as run_data:
-				i = 0
 				for line in run_data:
 					henk = json.loads(line)
-					if len(fitness) == i:
-						fitness.append([np.average(henk['fitness'])])
-						max_fitness.append([max(henk['fitness'])])
+					fitness = henk['fitness']
 
-					else:
-						fitness[i].append(np.average(henk['fitness']))
-						max_fitness[i].append(max(henk['fitness']))
-					i+=1
-
-		if fitness:
-			# std = [np.std(i) for i in fitness]
-			# average_fitness = [np.average(i) for i in fitness]
-			# average_max_fitness = [np.average(i) for i in max_fitness]
-			# std_max = [np.std(i) for i in max_fitness]
-			# plt.title('Algorithm: ' + alg[-1] + ', level: ' + str(level))
-			# plt.errorbar(range(len(average_fitness)), average_fitness, std)
-			# plt.errorbar(range(len(average_max_fitness)), average_max_fitness, std_max)
-			# plt.xlabel('Generation')
-			# plt.ylabel('Fitness')
-			# plt.show()
-			boxplot_data.append([max_fitness[-1], alg[-1], str(level)])
-boxplot_data = sorted(boxplot_data, key=lambda x: x[2])
-max_fitness_1 = [i[0] for i in boxplot_data if i[1] == '1']
-max_fitness_2 = [i[0] for i in boxplot_data if i[1] == '2']
-positions_1 = [int(i[2])*5  for i in boxplot_data if i[1] == '1']
-positions_2 = [1 + int(i[2])*5  for i in boxplot_data if i[1] == '2']
-
-labels = ['level ' + i[2] for i in boxplot_data if i[1] == '2']
-label_positions = [i - 0.5 for i in positions_2]
-
-for i in range(len(max_fitness_1)):
-
-	boxplot1 = plt.boxplot(max_fitness_1[i], widths=0.5, positions=[0], patch_artist=True)
-	boxplot2 = plt.boxplot(max_fitness_2[i], widths=0.5, positions=[1], patch_artist=True)
-	for box in boxplot1['boxes']:
-		box.set_facecolor('black')
-
-	for box in boxplot2['boxes']:
-		box.set_facecolor('blue')
+			print(len(fitness))
+			fittie.extend(fitness)
+		end_fitness.append([fittie, level, alg])
 
 
-	blue_patch = mpatches.Patch(color='blue', label='Algorithm 2')
-	black_patch = mpatches.Patch(color='black', label='Algorithm 1')
-	plt.legend(handles=[black_patch, blue_patch])
+ttest_data = []
+for i in range(3):
+	print(len(end_fitness[i][0]))
+	W1, p1 = stats.shapiro(end_fitness[i][0])
+	W2, p2 = stats.shapiro(end_fitness[i + 3][0])
+	st, p = stats.ttest_ind(end_fitness[i][0], end_fitness[i + 3][0])
+	stn, pn = stats.mannwhitneyu(end_fitness[i][0], end_fitness[i + 3][0])
+	ttest_data.append({'shapiro1': [W1, p1], 'shapiro2': [W2, p2] , 'ttest': [st,p], 'mannwhitneyu': [stn, pn] })
 
-	plt.xticks([])
-	plt.ylabel('Fitness')
-	plt.show()
+print(ttest_data)
 
-# print(max_fitness_1)
+	
+# positions_1 = [int(i[2])*5  for i in boxplot_data if i[1] == '1']
+# positions_2 = [1 + int(i[2])*5  for i in boxplot_data if i[1] == '2']
+
+# labels = ['level ' + i[2] for i in boxplot_data if i[1] == '2']
+# label_positions = [i - 0.5 for i in positions_2]
+
+# for i in range(len(max_fitness_1)):
+
+# 	boxplot1 = plt.boxplot(max_fitness_1[i], widths=0.5, positions=[0], patch_artist=True)
+# 	boxplot2 = plt.boxplot(max_fitness_2[i], widths=0.5, positions=[1], patch_artist=True)
+# 	for box in boxplot1['boxes']:
+# 		box.set_facecolor('black')
+
+# 	for box in boxplot2['boxes']:
+# 		box.set_facecolor('blue')
 
 
+# 	blue_patch = mpatches.Patch(color='blue', label='Algorithm 2')
+# 	black_patch = mpatches.Patch(color='black', label='Algorithm 1')
+# 	plt.legend(handles=[black_patch, blue_patch])
 
+# 	plt.xticks([])
+# 	plt.ylabel('Fitness')
+# 	plt.show()
+
+# ttest_data = []
+# for i in range(len(max_fitness_1)):
+# 	print(max_fitness_1[i])
+# 	print(max_fitness_2[i])
+# 	W1, p1 = stats.shapiro(max_fitness_1[i])
+# 	W2, p2 = stats.shapiro(max_fitness_2[i])
+# 	st, p = stats.ttest_ind(max_fitness_1[i], max_fitness_2[i])
+# 	stn, pn = stats.mannwhitneyu(max_fitness_1[i], max_fitness_2[i])
+
+# 	ttest_data.append({'shapiro1': [W1, p1], 'shapiro2': [W2, p2] , 'ttest': [st,p], 'mannwhitneyu': [stn, pn] })
+
+# # print(ttest_data)
 # scatter_pos_1 = [positions_1[i] for i in range(len(max_fitness_1)) for j in max_fitness_1[i]]
 # scatter_pos_2 = [positions_2[i] for i in range(len(max_fitness_2)) for j in max_fitness_2[i]]
 
