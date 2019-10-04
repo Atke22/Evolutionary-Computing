@@ -5,79 +5,129 @@ import sys, os
 import numpy as np
 import json
 import matplotlib.pyplot as plt
-# experiment_name = 'dummy_demo'
-# if not os.path.exists(experiment_name):
-#     os.makedirs(experiment_name)
+import matplotlib.patches as mpatches
+import glob
 
-# # # initializes environment with ai player using random controller, playing against static enemy
-# # env = Environment(experiment_name=experiment_name,
-# # 				  playermode="ai",
-# # 				  player_controller=player_controller(),
-# # 			  	  speed="normal",
-# # 				  enemymode="static",
-# # 				  level=2)
+algorithms = ['alg1', 'alg2']
+boxplot_data = []
+for alg in algorithms:
+	for level in range(1,4):
+		runs = glob.glob('results/'+ str(alg) + '/*/level_' + str(level) + '*[0-9].csv')
+		if not runs:
+			runs = glob.glob('results/'+ str(alg) + '/*/Alg1_enemy' + str(level) + '*[0-9].csv')
 
-# # n_hidden = env.player_controller.n_hidden[0]
-# # n_vars = (env.get_num_sensors()+1)*n_hidden + (n_hidden+1)*5 # multilayer with 10 hidden neurons
+		fitness = []
+		max_fitness = []
+		for run in runs:
+			with open(run, 'r') as run_data:
+				i = 0
+				for line in run_data:
+					henk = json.loads(line)
+					if len(fitness) == i:
+						fitness.append([np.average(henk['fitness'])])
+						max_fitness.append([max(henk['fitness'])])
 
-# # n = np.zeros(n_vars) + 0.5
+					else:
+						fitness[i].append(np.average(henk['fitness']))
+						max_fitness[i].append(max(henk['fitness']))
+					i+=1
 
-# def fitness(kid):
-# 	f, pl, el, gt = env.play(pcont=kid)
-# 	return f
+		if fitness:
+			# std = [np.std(i) for i in fitness]
+			# average_fitness = [np.average(i) for i in fitness]
+			# average_max_fitness = [np.average(i) for i in max_fitness]
+			# std_max = [np.std(i) for i in max_fitness]
+			# plt.title('Algorithm: ' + alg[-1] + ', level: ' + str(level))
+			# plt.errorbar(range(len(average_fitness)), average_fitness, std)
+			# plt.errorbar(range(len(average_max_fitness)), average_max_fitness, std_max)
+			# plt.xlabel('Generation')
+			# plt.ylabel('Fitness')
+			# plt.show()
+			boxplot_data.append([max_fitness[-1], alg[-1], str(level)])
+boxplot_data = sorted(boxplot_data, key=lambda x: x[2])
+max_fitness_1 = [i[0] for i in boxplot_data if i[1] == '1']
+max_fitness_2 = [i[0] for i in boxplot_data if i[1] == '2']
+positions_1 = [int(i[2])*5  for i in boxplot_data if i[1] == '1']
+positions_2 = [1 + int(i[2])*5  for i in boxplot_data if i[1] == '2']
 
-# # fitness(n)
+labels = ['level ' + i[2] for i in boxplot_data if i[1] == '2']
+label_positions = [i - 0.5 for i in positions_2]
 
-# def norm_fitness(fitness_list):
-# 	mini = np.amin(fitness_list)
-# 	fitness_list -= mini
-# 	return fitness_list/np.sum(fitness_list)
+for i in range(len(max_fitness_1)):
 
+	boxplot1 = plt.boxplot(max_fitness_1[i], widths=0.5, positions=[0], patch_artist=True)
+	boxplot2 = plt.boxplot(max_fitness_2[i], widths=0.5, positions=[1], patch_artist=True)
+	for box in boxplot1['boxes']:
+		box.set_facecolor('black')
 
-# def mutation_N_weigths_max_mutate(kid, weigths_c, max_mutate):
-# 	weigths_c = int(weigths_c)
-# 	## can't loop using for...in, as choice returns new list
-# 	for i in np.random.choice(kid.size, weigths_c,replace=False):
-# 		kid[i] += np.random.uniform(-max_mutate, max_mutate)
-# 		if kid[i] > 1:
-# 			kid[i] = 1
-
-# 		elif kid[i] < -1:
-# 			kid[i] = -1
-# 	return kid
-
-
-
-# def save_data(kid_fitness_list, save_file):
-# 	with open(save_file, 'a') as csvfile:
-# 		new_line = ','.join(str(kid_fitness) for kid_fitness in kid_fitness_list)
-# 		csvfile.write(new_line + '\n')
-
-
-file_name = 'results/level_2_run_2.csv'
-
-fitness = []
-std = []
-min_fit = []
-max_fit = []
-
-with open(file_name, 'r') as data_file:
-	for line in data_file:
-		henk = json.loads(line)
-		fitness.append(np.average(henk['fitness']))
-		std.append(np.std(henk['fitness']))
-		min_fit.append(min(henk['fitness']))
-		max_fit.append(np.average(sorted(henk['fitness'])[-10:]))
+	for box in boxplot2['boxes']:
+		box.set_facecolor('blue')
 
 
-# plt.plot(range(len(fitness)), fitness)
-# plt.errorbar(range(len(fitness)), fitness, std)
-plt.plot(range(len(std)), std, 'o')
+	blue_patch = mpatches.Patch(color='blue', label='Algorithm 2')
+	black_patch = mpatches.Patch(color='black', label='Algorithm 1')
+	plt.legend(handles=[black_patch, blue_patch])
 
-# plt.plot(range(len(min_fit)), min_fit, 'ro')
-# plt.plot(range(len(max_fit)), max_fit, 'go')
-# plt.plot(range(len(max_fit)), max_fit, 'go')
+	plt.xticks([])
+	plt.ylabel('Fitness')
+	plt.show()
+
+# print(max_fitness_1)
 
 
-plt.show()
+
+# scatter_pos_1 = [positions_1[i] for i in range(len(max_fitness_1)) for j in max_fitness_1[i]]
+# scatter_pos_2 = [positions_2[i] for i in range(len(max_fitness_2)) for j in max_fitness_2[i]]
+
+# print(scatter_pos_2)
+# print(max_fitness_2)
+# plt.scatter(scatter_pos_1, max_fitness_1)
+# plt.scatter(scatter_pos_2, max_fitness_2)
+
+
+
+
+
+
+
+# jorien  = 0
+# inge = 100
+# for level in range(1,4):
+# 	i = 0
+# 	file_name = 'results/level_' + str(level) + '_run_' + str(i) +'.csv'
+# 	if not os.path.exists(experiment_name):
+# 		i+=1
+
+# 		fitness = []
+# 		std = []
+# 		min_fit = []
+# 		max_fit = []
+# 		max_fit_10 = []
+# 		min_el = []
+# 		max_pl = []
+# 		game_time = []
+# 		with open(file_name, 'r') as data_file:
+# 			for line in data_file:
+# 				henk = json.loads(line)
+# 				fitness.append(np.average(henk['fitness']))
+# 				std.append(np.std(henk['fitness']))
+# 				min_fit.append(min(henk['fitness']))
+# 				min_el.append(min(henk['enemy_life']))
+# 				max_pl.append(max(henk['player_life'])/100)
+# 				i = henk['player_life'].index(max(henk['player_life']))
+# 				game_time.append(henk['game_time'][i]/1000)
+# 				max_fit_10.append(np.average(sorted(henk['fitness'])[-10:]))
+# 				max_fit.append(sorted(henk['fitness'])[-1])
+
+# 		plt.plot(range(len(fitness)), fitness)
+# 		# plt.errorbar(range(len(fitness)), fitness, std)
+# 		# plt.plot(range(len(std)), std)
+# 		# plt.plot(range(len(game_time)), game_time)
+# 		# plt.plot(range(len(max_pl)), max_pl)
+# 		# plt.title('maximum player life')
+# 		# plt.plot(range(len(min_fit)), min_fit, 'ro')
+# 		plt.plot(range(len(max_fit)), max_fit, 'go')
+# 		print(max(max_fit))
+
+# 		plt.show()
 

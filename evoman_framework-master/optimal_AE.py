@@ -19,8 +19,8 @@ if not os.path.exists(experiment_name):
 
 
 level = 2
-pop_size = 500
-gen_number = 500
+pop_size = 100
+gen_number = 100
 min_weight = -1
 max_weight = 1
 

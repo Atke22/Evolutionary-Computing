@@ -20,7 +20,7 @@ if not os.path.exists(experiment_name):
 
 level = 3
 pop_size = 100
-gen_number = 500
+gen_number = 100
 min_weight = -1
 max_weight = 1
 
@@ -52,7 +52,7 @@ best_fitness = 0
 
 def find_next_file():
 	i = 0 
-	file_name = 'results/level_' + str(level) + '_run_'
+	file_name = 'results/alg2/Alwan/level_' + str(level) + '_run_'
 	while os.path.exists(file_name + str(i) + '.csv'):
 		i+=1
 
@@ -203,57 +203,57 @@ def continue_old_run(weightsfile):
 
 	return data
 
+for j in range(10):
+	start_pop = np.random.uniform(min_weight, max_weight, (pop_size, n_vars))
 
-start_pop = np.random.uniform(min_weight, max_weight, (pop_size, n_vars))
-
-data = []
-
-
-file_name, weights_file, best_file = find_next_file()
+	data = []
 
 
-# weights_file = 'results/level_2_run_0_weigths.csv'
+	file_name, weights_file, best_file = find_next_file()
+
+
+	# weights_file = 'results/level_2_run_0_weigths.csv'
 
 
 
-# data = continue_old_run(weights_file)
+	# data = continue_old_run(weights_file)
 
 
-for kid in start_pop:
-	fit, pl, el, gt = fitness(kid)
+	for kid in start_pop:
+		fit, pl, el, gt = fitness(kid)
 
-	data.append({
-			'weights' : kid,
-			'fitness' : fit,
-			'player_life' : pl,
-			'enemy_life' : el,
-			'game_time' : gt
-		})
+		data.append({
+				'weights' : kid,
+				'fitness' : fit,
+				'player_life' : pl,
+				'enemy_life' : el,
+				'game_time' : gt
+			})
 
-save_data(data)
-
-for i in range(gen_number):
-	
-	# create new offspring 
-	data = speeddate(data, offspring_num, num_potential_partners)
-	
-	# select which inididuals will go the next generation
-	data = roulette_wheel_survivor_selection(data, pop_size)
-	
-	fitness_std = np.std(make_list(data, 'fitness'))
-	if fitness_std > 20:
-		Jorien/=1.1
-	elif fitness_std < 10:
-		Jorien*=1.1
-	if Jorien > n_vars:
-		Jorien = n_vars
-
-	best_individual = sorted(data, key=lambda x: x['fitness'])[-1]
-	if best_individual['fitness'] > best_fitness:
-		best_fitness = best_individual['fitness']
-		save_best(best_individual)
-	# print(best_individual['fitness'])
 	save_data(data)
+
+	for i in range(gen_number):
+		
+		# create new offspring 
+		data = speeddate(data, offspring_num, num_potential_partners)
+		
+		# select which inididuals will go the next generation
+		data = roulette_wheel_survivor_selection(data, pop_size)
+		
+		fitness_std = np.std(make_list(data, 'fitness'))
+		if fitness_std > 20:
+			Jorien/=1.1
+		elif fitness_std < 10:
+			Jorien*=1.1
+		if Jorien > n_vars:
+			Jorien = n_vars
+
+		best_individual = sorted(data, key=lambda x: x['fitness'])[-1]
+		if best_individual['fitness'] > best_fitness:
+			best_fitness = best_individual['fitness']
+			save_best(best_individual)
+		# print(best_individual['fitness'])
+		save_data(data)
 
 
 
