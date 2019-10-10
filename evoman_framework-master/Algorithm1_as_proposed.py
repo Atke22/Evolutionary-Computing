@@ -47,8 +47,8 @@ min_weight = -1
 max_weight = 1
 
 # parameter settings of the algorithm
-pop_size = 10
-gen_number = 10
+pop_size = 100
+gen_number = 100
 runs = 10
 mutation_rate = 0.1
 parent_fraction = 0.5
