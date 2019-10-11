@@ -31,15 +31,15 @@ continue_file = 'results/'
 
 # initialises the framework. enemy number can be changed accordingly
 
-enemy = 2
 
 env = Environment(experiment_name=experiment_name,
 				  playermode="ai",
 				  player_controller=player_controller(),
+				  multiplemode = 'yes',
 				  speed="fastest",
 				  enemymode="static",
 				  level=2,
-				  enemies = [2])
+				  enemies = [1,2,3,4,5,6,7,8])
 
 
 
@@ -54,9 +54,9 @@ max_weight = 1
 
 
 # parameter settings of the algorithm
-pop_size = 100
+pop_size = 50
 gen_number = 100
-runs = 10
+runs = 1
 mutation_rate = 0.1
 parent_fraction = 0.5
 partner_fraction = 0.1
@@ -200,7 +200,7 @@ def sum_list(data, key):
 # finds suitable name for the csv file of a run
 def find_next_file():
 	i = 0 
-	file_name = 'results/level_' + str(enemy) + '_run_'
+	file_name = 'results/Inge/generalist_' + str(enemy) + '_run_'
 	while os.path.exists(file_name + str(i) + '.csv'):
 		i+=1
 
