@@ -586,11 +586,16 @@ class Environment(object):
             vplayerlife.append(playerlife)
             venemylife.append(enemylife)
             vtime.append(time)
+        vtime = 0
 
-        vfitness = self.cons_multi(numpy.array(vfitness))
+        for enemy in venemylife:
+            if enemy <= 0:
+                vtime += 1
+
+        vfitness = sum(vplayerlife) - sum(venemylife)
         vplayerlife = self.cons_multi(numpy.array(vplayerlife))
         venemylife = self.cons_multi(numpy.array(venemylife))
-        vtime = self.cons_multi(numpy.array(vtime))
+        #vtime = self.cons_multi(numpy.array(vtime))
 
         return    vfitness, vplayerlife, venemylife, vtime
 
