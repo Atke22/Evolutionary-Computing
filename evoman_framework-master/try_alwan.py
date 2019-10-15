@@ -8,42 +8,60 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import glob
 from scipy import stats
-
+henk2 = []
 algorithms = ['alg1', 'alg2']
-boxplot_data = []
-end_fitness = []
 for alg in algorithms:
-	for level in range(1,4):
-		runs = glob.glob('results/'+ str(alg) + '/*/level_' + str(level) + '*[0-9].csv')
-		
-		runs.extend(glob.glob('results/'+ str(alg) + '/*/Alg1_enemy' + str(level) + '*[0-9].csv'))
-		#fitness = []
-		max_fitness = []
-		fittie = []
-		for run in runs:
-			fitness = []
-			with open(run, 'r') as run_data:
-				for line in run_data:
-					henk = json.loads(line)
-					fitness = henk['fitness']
+	average_fitness = []
+	fit_std = []
+	maximum = []
+	minimum = []
+	runs = glob.glob('results/' + alg +  '/*/*general*[0-9].csv')
+	for run in runs:
+		fitness = []
+		std = []
+		maxi = []
+		mini = []
+		with open(run, 'r') as data_file:
+			lines = data_file.read().splitlines()
+			for line in lines:
+				henk = json.loads(line)
+				fitness.append(np.average(henk['fitness']))
+				std.append(np.std(henk['fitness']))
+				maxi.append(max(henk['fitness']))
+				mini.append(min(henk['fitness']))
 
-			print(len(fitness))
-			fittie.extend(fitness)
-		end_fitness.append([fittie, level, alg])
 
+		for i in range(len(fitness)):
+			if i < len(average_fitness):
+				average_fitness[i].append(fitness[i])
+				fit_std[i].append(std[i])
+				maximum[i].append(maxi[i])
+				minimum[i].append(mini[i])
 
-ttest_data = []
-for i in range(3):
-	print(len(end_fitness[i][0]))
-	W1, p1 = stats.shapiro(end_fitness[i][0])
-	W2, p2 = stats.shapiro(end_fitness[i + 3][0])
-	st, p = stats.ttest_ind(end_fitness[i][0], end_fitness[i + 3][0])
-	stn, pn = stats.mannwhitneyu(end_fitness[i][0], end_fitness[i + 3][0])
-	ttest_data.append({'shapiro1': [W1, p1], 'shapiro2': [W2, p2] , 'ttest': [st,p], 'mannwhitneyu': [stn, pn] })
+			else:
+				average_fitness.append([fitness[i]])
+				fit_std.append([std[i]])
+				maximum.append([maxi[i]])
+				minimum.append([mini[i]])
 
-print(ttest_data)
+		last_line = lines[-1]
+		henk = json.loads(last_line)
+		for fitness in henk['fitness']:
+			henk2.append([run, fitness])
+	average_fitness = [np.average(i) for i in average_fitness]
+	fit_std = [np.average(i) for i in fit_std]
+	maximum = [np.average(i) for i in maximum]
+	minimum = [np.average(i) for i in minimum]
 
-	
+	plt.errorbar(range(len(average_fitness)), average_fitness, fit_std, alpha=0.5, label=alg)
+	plt.plot(range(len(maximum)), maximum, 'o', label=alg)
+	plt.plot(range(len(maximum)), minimum, 'o', label=alg)
+plt.legend()
+plt.show()
+
+piet = sorted(henk2, key=lambda x: x[1])
+print(piet[-10:])
+
 # positions_1 = [int(i[2])*5  for i in boxplot_data if i[1] == '1']
 # positions_2 = [1 + int(i[2])*5  for i in boxplot_data if i[1] == '2']
 

@@ -200,12 +200,26 @@ def sum_list(data, key):
 # finds suitable name for the csv file of a run
 def find_next_file():
 	i = 0 
-	file_name = 'results/Inge/generalist_' + str(enemy) + '_run_'
+	file_name = 'results/Alwan/generalist_run_'
 	while os.path.exists(file_name + str(i) + '.csv'):
 		i+=1
 
-	file_name += str(i) 
-	return file_name + '.csv', file_name + '_weigths.csv', file_name + '_best.csv'
+	file_name += str(i)
+
+	data_file = file_name + '.csv'
+	with open(data_file, 'w') as a:
+		a.write('')
+
+	weights_file = file_name + '_weigths.csv'
+	with open(weights_file, 'w'):
+		a.write('')
+
+	best_file = file_name + '_best.csv'
+	with open(best_file, 'w'):
+		a.write('')
+	print('henk')
+
+	return data_file, weights_file, best_file
 
 # saves data of a generation
 def save_data(kid_list):
